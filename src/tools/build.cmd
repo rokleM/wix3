@@ -1,0 +1,1 @@
+msbuild tools.proj /t:Build "/p:PlatformSdkBinPath=C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\;Configuration=Release;PlatformToolset=v142" /p:"DisableSpecificCompilerWarnings=4996;4091;4458;4564" /m

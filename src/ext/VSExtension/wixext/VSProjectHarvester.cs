@@ -1,21 +1,20 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+
 namespace Microsoft.Tools.WindowsInstallerXml.Extensions
 {
     using System;
-    using System.IO;
-    using System.Reflection;
     using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
-
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
-
     // Instead of directly referencing this .NET 2.0 assembly,
     // use reflection to allow building against .NET 1.1.
     // (Successful runtime use of this class still requires .NET 2.0.)
@@ -571,6 +570,23 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions
                     Wix.File exeFileAsWixFile = exeFile as Wix.File;
                     // Case insensitive replace
                     appConfigFileAsWixFile.Source = Regex.Replace(appConfigFileAsWixFile.Source, @"app\.config", Path.GetFileName(exeFileAsWixFile.Source) + ".config", RegexOptions.IgnoreCase);
+
+                    var component             = appConfigFileAsWixFile.ParentElement as Wix.Component;
+                    var locDirectory          = component.ParentElement as Wix.DirectoryRef;
+                    var parentDir             = locDirectory.ParentElement as Wix.IParentElement;
+
+                    string parentDirId = null;
+
+                    if (parentDir is Wix.DirectoryRef)
+                    {
+                        parentDirId = this.directoryRefSeed;
+                    }
+                    else if (parentDir is Wix.Directory)
+                    {
+                        parentDirId = ((Wix.Directory)parentDir).Id;
+                    }
+                    appConfigFileAsWixFile.Id = this.Core.GenerateIdentifier(FilePrefix, locDirectory.Id, appConfigFileAsWixFile.Source);
+                    component.Id              = this.Core.GenerateIdentifier(ComponentPrefix, locDirectory.Id, appConfigFileAsWixFile.Id);
                 }
             }
 
@@ -864,14 +880,16 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions
 
             string version = "2.0";
 
-            foreach (XmlNode child in document.ChildNodes)
-            {
-                if (String.Equals(child.Name, "Project", StringComparison.Ordinal) && child.Attributes != null)
-                {
+            foreach(XmlNode child in document.ChildNodes) {
+                if(String.Equals(child.Name, "Project", StringComparison.Ordinal) && child.Attributes != null) {
                     XmlNode toolsVersionAttribute = child.Attributes["ToolsVersion"];
-                    if (toolsVersionAttribute != null)
-                    {
+                    if(toolsVersionAttribute != null) {
                         version = toolsVersionAttribute.Value;
+                        this.Core.OnMessage(VSVerboses.FoundToolsVersion(version));
+                    }
+                    XmlNode sdkAttribute = child.Attributes["Sdk"];
+                    if(sdkAttribute != null) {
+                        version = "Current";
                         this.Core.OnMessage(VSVerboses.FoundToolsVersion(version));
                     }
                 }
@@ -893,6 +911,13 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions
                     break;
                 case "14.0":
                     project = ConstructMsbuildWrapperProject(projectFile, this.Core, this.configuration, this.platform, "14");
+                    break;
+                case "15.0":
+                    project = ConstructMsbuildWrapperProject(projectFile, this.Core, this.configuration, this.platform, "15");
+                    break;
+                case "16.0":
+                case "Current":
+                    project = ConstructMsbuildWrapperProject(projectFile, this.Core, this.configuration, this.platform, "16");
                     break;
                 default:
                     project = ConstructMsbuild35Project(projectFile, this.Core, this.configuration, this.platform);

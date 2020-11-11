@@ -10,6 +10,8 @@
 
     <ProjectReference Include="wixext\WixVSExtension.MSBuild12\WixVSExtension.MSBuild12.csproj" Condition=" '$(VS2013Available)'=='true' " />
     <ProjectReference Include="wixext\WixVSExtension.MSBuild14\WixVSExtension.MSBuild14.csproj" Condition=" '$(VS2015Available)'=='true' " />
+    <ProjectReference Include="wixext\WixVSExtension.MSBuild15\WixVSExtension.MSBuild15.csproj" Condition=" '$(VS2017Available)'=='true' " />
+    <ProjectReference Include="wixext\WixVSExtension.MSBuild16\WixVSExtension.MSBuild16.csproj" Condition=" '$(VS2017Available)'=='true' " />
   </ItemGroup>
 
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\Traversal.targets" />

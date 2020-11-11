@@ -1,0 +1,1 @@
+msbuild ext.proj /t:Build "/p:PlatformSdkBinPath=C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\;Configuration=Release;PlatformToolset=v142" /p:"DisableSpecificCompilerWarnings=4996;4091;4458;4564;4244" /p:"WixTargetsPath=D:\Projects\wix3\src\tools\WixTasks\wix.targets" /p:"WixCATargetsPath=D:\Projects\wix3\src\tools\WixTasks\wix.ca.targets" /m
