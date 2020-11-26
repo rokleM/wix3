@@ -26,7 +26,7 @@
     <ProjectReference Include="smoke\smoke.csproj" />
     <ProjectReference Include="wixcop\wixcop.csproj" />
 
-    <ProjectReference Include="thmviewer\thmviewer.vcxproj" />
+    <!-- <ProjectReference Include="thmviewer\thmviewer.vcxproj" /> -->
   </ItemGroup>
 
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\Traversal.targets" />

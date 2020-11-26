@@ -12,8 +12,8 @@
     <ProjectReference Include="Libraries\WindowsInstaller.Linq\WindowsInstaller.Linq.csproj" />
     <ProjectReference Include="Libraries\WindowsInstaller.Package\WindowsInstaller.Package.csproj" />
     <ProjectReference Include="Tools\Tools.proj" />
-    <ProjectReference Include="Tests\Tests.proj" />
-    <ProjectReference Include="Samples\Samples.proj" />
+    <!-- <ProjectReference Include="Tests\Tests.proj" /> -->
+    <!-- <ProjectReference Include="Samples\Samples.proj" /> -->
     <!-- <ProjectReference Include="Documents\Guide\dtfguide.helpproj" Condition="$(BuildSandcastleDocumentation)"/> -->
   </ItemGroup>
 

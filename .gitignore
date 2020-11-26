@@ -22,6 +22,9 @@ obj/
 *.tlh
 *.tmp
 *.log
+*.dll
+*.pdb
+*.lib
 *.opendb
 *.opensdf
 *.sdf
@@ -30,9 +33,6 @@ obj/
 *.cachefile
 *.VC.db
 *.VC.VC.opendb
-tools/release/curl/curl.exe
-tools/release/curl/libcurl.dll
-tools/release/curl/libcurl_imp.lib
-tools/release/curl/libeay32.dll
-tools/release/curl/ssleay32.dll
-tools/release/curl/zlib1.dll
+*.res
+*.exe
+**/bin/Release/*

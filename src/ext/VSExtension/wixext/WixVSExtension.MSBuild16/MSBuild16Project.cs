@@ -123,12 +123,12 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions.WixVSExtension
 				}
 			}
 
-			this.buildManager = new BuildManager();
-			this.projectCollection = new ProjectCollection(globalVariables);
-			if(sdkStyle) {
-				projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, basePath, projectCollection, string.Empty));
-			}
 			try {
+				this.buildManager = new BuildManager();
+				this.projectCollection = new ProjectCollection(globalVariables);
+				if(sdkStyle) {
+					projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, basePath, projectCollection, string.Empty));
+				}
 				this.currentProject = this.projectCollection.LoadProject(projectPath);
 				this.currentProjectInstance = this.currentProject.CreateProjectInstance();
 			}
@@ -260,13 +260,14 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions.WixVSExtension
 			dotnet/sdk/5.0.100/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.TargetFrameworkInference.targets:52.
 
 			<PropertyGroup Condition="'$(TargetFramework)' != '' and ('$(TargetFrameworkIdentifier)' == '' or '$(TargetFrameworkVersion)' == '')">
-
 				<TargetFrameworkIdentifier>$([MSBuild]::GetTargetFrameworkIdentifier('$(TargetFramework)'))</TargetFrameworkIdentifier>
 				<TargetFrameworkVersion>v$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)', 2))</TargetFrameworkVersion>
 			</PropertyGroup>
 			*/
-			result.Add("TargetFrameworkIdentifier", GetTargetFrameworkIdentifier(targetFramework));
-			result.Add("TargetFrameworkVersion",    $"v{GetTargetFrameworkVersion(targetFramework, 2)}");
+			var targetFrameworkIdentifier = GetTargetFrameworkIdentifier(targetFramework);
+			var targetFrameworkVersion    = GetTargetFrameworkVersion(targetFramework, 2);
+			result.Add("TargetFrameworkIdentifier", targetFrameworkIdentifier ?? "");
+			result.Add("TargetFrameworkVersion",    $"v{targetFrameworkVersion}");
 			/*
 			dotnet/sdk/5.0.100/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.TargetFrameworkInference.targets:60.
 
@@ -290,14 +291,17 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions.WixVSExtension
 				targetPlatformVersion = GetTargetPlatformVersion(targetFramework, 2);
 			}
 			if(targetPlatformVersion == "0.0") {
-				targetPlatformVersion = "";
+				targetPlatformVersion = "7.0"; // This fixes some problems with version resolution on C:\Program Files\dotnet\sdk\5.0.100\Microsoft.Common.CurrentVersion.targets (which should not be there, but are nonetheless)
 			}
 			if(targetPlatformIdentifier.Equals("Windows", StringComparison.OrdinalIgnoreCase)) {
 				targetPlatformIdentifier = "Windows";
 			}
-			result.Add("TargetPlatformIdentifier", targetPlatformIdentifier);
-			result.Add("TargetPlatformVersion",    targetPlatformIdentifier);
-
+			result.Add("TargetPlatformIdentifier", targetPlatformIdentifier ?? "");
+			result.Add("TargetPlatformVersion",    targetPlatformVersion    ?? "");
+			// System.Console.WriteLine($"TargetFrameworkIdentifier: '{targetFrameworkIdentifier}'");
+			// System.Console.WriteLine($"TargetFrameworkVersion:    '{targetFrameworkVersion}'");
+			// System.Console.WriteLine($"TargetPlatformIdentifier:  '{targetPlatformIdentifier is null}'");
+			// System.Console.WriteLine($"TargetPlatformVersion:     '{targetPlatformVersion  is null}'");
 			return result;
 		}
 
