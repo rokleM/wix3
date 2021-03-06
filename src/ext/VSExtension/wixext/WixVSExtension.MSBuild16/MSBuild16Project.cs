@@ -87,7 +87,7 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions.WixVSExtension
 			var globalVariables = new Dictionary<string, string>();
 			var basePath = GetCoreBasePath(projectPath);
 			if(sdkStyle) {
-				var tfm = doc.Root.Descendants("TargetFramework").FirstOrDefault().Value;
+				var tfm = doc.Root.Descendants("TargetFramework").FirstOrDefault()?.Value ?? doc.Root.Descendants("TargetFrameworks").FirstOrDefault()?.Value.Split(';').FirstOrDefault() ?? throw new Exception("Could not find TargetFramework for project.");
 				globalVariables = GetCoreGlobalProperties(projectPath, basePath, tfm);
 				Environment.SetEnvironmentVariable("MSBuildExtensionsPath", globalVariables["MSBuildExtensionsPath"]);
 				Environment.SetEnvironmentVariable("MSBuildSDKsPath", globalVariables["MSBuildSDKsPath"]);
@@ -191,7 +191,8 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions.WixVSExtension
 			throw new Exception("Could not locate base path in `dotnet --info` results");
 		}
 
-		public Dictionary<string, string> GetCoreGlobalProperties(string projectPath, string toolsPath, string targetFramework)
+		public Dictionary<string, string>
+		GetCoreGlobalProperties(string projectPath, string toolsPath, string targetFramework)
 		{
 			string solutionDir = Path.GetDirectoryName(projectPath);
 			string extensionsPath = toolsPath;
@@ -199,10 +200,10 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions.WixVSExtension
 			string roslynTargetsPath = Path.Combine(toolsPath, "Roslyn");
 			var result = new Dictionary<string, string>
 			{
-				{ "SolutionDir", solutionDir },
+				{ "SolutionDir",           solutionDir },
 				{ "MSBuildExtensionsPath", extensionsPath },
-				{ "MSBuildSDKsPath", sdksPath },
-				{ "RoslynTargetsPath", roslynTargetsPath },
+				{ "MSBuildSDKsPath",       sdksPath },
+				{ "RoslynTargetsPath",     roslynTargetsPath },
 			};
 
 			var nugetAssemblyPath                          = Path.Combine(GetVsDirectory(), "Common7", "IDE", "CommonExtensions", "Microsoft", "NuGet", "NuGet.Frameworks.dll");
@@ -323,8 +324,10 @@ namespace Microsoft.Tools.WindowsInstallerXml.Extensions.WixVSExtension
 			// 	.Select(m => System.IO.Path.Combine(m.Groups[2].Value, m.Groups[1].Value, "MSBuild.dll"));
 
 			// var sdkPath = sdkPaths.Last();
-			var msbuildPath = Path.Combine(GetMsBuildDirectory(), "MSBuild.exe");
-			Environment.SetEnvironmentVariable("MSBUILD_EXE_PATH", msbuildPath);
+			if(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILD_EXE_PATH"))) {
+				var msbuildPath = Path.Combine(GetMsBuildDirectory(), "MSBuild.exe");
+				Environment.SetEnvironmentVariable("MSBUILD_EXE_PATH", msbuildPath);
+			}
 		}
 
 		static string GetVsDirectory()
